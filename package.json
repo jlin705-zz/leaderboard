@@ -6,7 +6,8 @@
   "scripts": {
     "build": "NODE_ENV=production webpack --config ./webpack.prod.config.js --progress --colors",
     "start": "nodemon --exec babel-node server.js --ignore public",
-    "dev": "webpack -wd"
+    "dev": "webpack -wd",
+    "heroku-postbuild": "webpack -p --config ./webpack.prod.config.js --progress"
   },
   "author": "jialiangl",
   "license": "ISC",
