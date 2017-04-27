@@ -4,7 +4,7 @@ import config from '../config';
 import assert from 'assert';
 import GoogleImages from 'google-images';
 
-var giphy =require('giphy-api')();
+var giphy =require('giphy-api')({https: true});
 
 let mdb;
 
