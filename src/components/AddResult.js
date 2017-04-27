@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import { Dropdown, Button, Label } from 'semantic-ui-react';
+import { Dropdown, Button, Label, Confirm } from 'semantic-ui-react';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 export default class AddResult extends Component {
     state = {
         players: [],
         leaderboards: [],
         numDropdowns: 3,
-        gameData: {}
+        gameData: {},
+        openConfirm: false,
+        toLeaderboard: false,
+        error: false
     };
 
     componentDidMount() {
@@ -83,7 +87,8 @@ export default class AddResult extends Component {
         }).then(resp => {
             if (resp.data == 'good') {
                 this.setState ({
-                    sucess: true
+                    sucess: true,
+                    toLeaderboard: true
                 })
             }
         })
@@ -100,10 +105,47 @@ export default class AddResult extends Component {
         this.setState({
             gameData: newGameData
         });
+    };
+
+    getResult() {
+        const gameData = this.state.gameData;
+        let players = '';
+        for (const prop in gameData) {
+        // skip loop if the property is from prototype
+        if(!gameData.hasOwnProperty(prop) || prop == 'leaderboard' || prop == 'winner') continue;
+
+        players = players + ', ' + gameData[prop];
     }
+        return `${gameData.winner} won the game ${gameData.leaderboard} aganst ${players}`
+    };
+
+    handleCancel() {
+        this.setState({
+            openConfirm: false
+        })
+    };
+
+    confirm() {
+        if (this.state.gameData && this.state.gameData.winner) {
+            this.setState({
+                openConfirm: true,
+                error: false
+            })
+        }
+        else {
+            this.setState({
+                error: true
+            });
+        }
+    };
 
     render() {
         const label = this.state.sucess ? <Label basic color='green' pointing='left'>Succeed!</Label> : '';
+        const leaderboardPath = `/leaderboard/${this.state.gameData.leaderboard}`;
+
+        if (this.state.toLeaderboard) {
+            return <Redirect push to={leaderboardPath} />
+        }
         return (
             <div>
                 <h1>Log your game result here:</h1>
@@ -116,7 +158,15 @@ export default class AddResult extends Component {
                     <Button.Group>
                         <Button onClick={this.playerIncreament.bind(this)}>Add player</Button>
                         <Button.Or />
-                        <Button positive onClick={this.submitResult.bind(this)}>Save</Button>
+                        <Button positive onClick={this.confirm.bind(this)}>Save</Button>
+                        {this.state.error ? <Label basic color='red' pointing='left'>Result cannot be empty!</Label> : null}
+                        <Confirm
+                            open={this.state.openConfirm}
+                            header="Saving the result:"
+                            content={this.getResult()}
+                            onCancel={this.handleCancel.bind(this)}
+                            onConfirm={this.submitResult.bind(this)}
+                        />
                     </Button.Group>
                     {label}
                 </div>

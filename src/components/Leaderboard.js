@@ -28,7 +28,7 @@ export default class Leaderboard extends Component{
         const players = this.state.players;
         return players.length > 0 && player.points == players[0].points;
     }
-    
+
     isLast(player) {
 	const players = this.state.players;
         return players.length > 0 && player.points == players[players.length - 1].points;
@@ -58,7 +58,7 @@ export default class Leaderboard extends Component{
                             <Table.Cell>
                                 {this.isFirst(player) ? <Label ribbon color='yellow'>First</Label> : null}
 				{this.isLast(player) ? <Label ribbon color='red'>You should stop!</Label> : null}
-                                {player.name}
+                                {player.name} {player.cheat ? <i aria-hidden="true" className="spy icon"></i> : null}
                             </Table.Cell>
                             <Table.Cell>{player.points}</Table.Cell>
                             <Table.Cell>{player.wins}</Table.Cell>
@@ -69,6 +69,7 @@ export default class Leaderboard extends Component{
                     )}
                     </Table.Body>
                 </Table>
+                <p><i aria-hidden="true" className="spy icon"></i> Indicates possible cheating and/or use of performance enhancing drugs</p>
                 </div>
             )
         } else {
