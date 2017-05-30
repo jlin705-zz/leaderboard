@@ -4,6 +4,7 @@ import Home from './Home';
 import BoardList from './BoardList';
 import Leaderboard from './Leaderboard';
 import AdderList from './AdderList';
+import DonutsBoard from './DonutsBoard';
 import { Route } from 'react-router-dom';
 
 class App extends Component{
@@ -17,8 +18,9 @@ class App extends Component{
             <Route exact path='/leaderboards' component={BoardList} />
             <Route path='/leaderboard/:gameName' component={Leaderboard} />
             <Route path='/logResult' component={AdderList} />
+            <Route path='/donuts' component={DonutsBoard} />
         </div>
-        )
+    );
     }
 }
 

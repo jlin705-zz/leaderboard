@@ -1,10 +1,6 @@
 import express from 'express';
-import { MongoClient, ObjectID } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import config from '../config';
-import assert from 'assert';
-import GoogleImages from 'google-images';
-
-var giphy =require('giphy-api')({https: true});
 
 let mdb;
 
@@ -16,46 +12,29 @@ MongoClient.connect(config.mongodbUri, (err, db) => {
     }
 });
 
-const searchClient = new GoogleImages(config.searchEngineId, config.searchEngineApiKey);
-
 const router = express.Router();
-
-
-function doSearch(leaderboards, results, res) {
-    if (leaderboards.length > 0) {
-        const next = leaderboards.pop();
-        giphy.search({
-            q: next.name,
-            limit: 10})
-            .then((resp) => {
-                const rand = Math.floor(10 * Math.random());
-                const url = resp.data[rand]?resp.data[rand].embed_url:'';
-                next['imageUrl'] = url;
-                results.push(next);
-                doSearch(leaderboards, results, res);
-
-            })
-    }else {
-        res.send({leaderboards: results});
-    }
-};
 
 router.get('/boardList', (req, res) => {
     console.log('GET /api/boardList');
-    let leaderboards = [];
-    let results = [];
-    let mdbCollections = mdb.listCollections();
-    mdbCollections.each((err, leaderboard) => {
-        assert.equal(null, err);
-        if (!leaderboard) {
-            doSearch(leaderboards, results, res);
-            return;
-        }
-	if (leaderboard.name != "system.indexes"){
-       		leaderboards.push(leaderboard);
-	}
-    });
+    mdb.collection('BoardList')
+        .find({})
+        .toArray((err, docs) => {
+            res.send(docs);
+        });
 
+});
+
+router.get('/donuts', (req, res) => {
+    console.log('GET /api/donuts');
+    mdb.collection('RentalsDonuts')
+        .find({})
+        .sort({'count': -1, 'name': 1})
+        .toArray((err, docs) => {
+            if (err) {
+                console.error(err);
+            }
+            res.send(docs);
+        });
 });
 
 router.get('/leaderboard/:name', (req, res) => {
@@ -65,8 +44,8 @@ router.get('/leaderboard/:name', (req, res) => {
         .find({})
         .sort({'points': -1})
         .toArray((err, docs) => {
-            res.send(docs)
-        })
+            res.send(docs);
+        });
 
 });
 
@@ -83,16 +62,32 @@ router.put('/update/:name', (req, res) => {
     playerCount = playerCount - 2;
 
     if (winner) {
-        collection.findOneAndUpdate({name: winner}, {$inc: {wins: 1, games: 1, points: playerCount}}, {returnOriginal: false, upsert: true})
+        collection.findOneAndUpdate({name: winner}, {$inc: {wins: 1, games: 1, points: playerCount}}, {returnOriginal: false, upsert: true});
     } else {
         res.send('There is no winner selelcted!');
     }
 
     for (let i = 0; i < playerCount; ++ i) {
         const player = data[`player_${i}`];
-        collection.findOneAndUpdate({name: player}, {$inc: {losses: 1, games: 1, points: -1}}, {returnOriginal: false, upsert: true})
+        collection.findOneAndUpdate({name: player}, {$inc: {losses: 1, games: 1, points: -1}}, {returnOriginal: false, upsert: true});
     }
 
+    res.send('good');
+});
+
+router.put('/donuts/add/:name', (req, res) => {
+    let updateName = req.params.name;
+    console.log(`PUT /api/donuts/add/${updateName}`);
+    const collectionDonuts = mdb.collection('RentalsDonuts');
+    collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}}, {returnOriginal: false, upsert: true});
+    res.send('good');
+});
+
+router.put('/donuts/clear/:name', (req, res) => {
+    let updateName = req.params.name;
+    console.log(`PUT /api/donuts/add/${updateName}`);
+    const collectionDonuts = mdb.collection('RentalsDonuts');
+    collectionDonuts.findOneAndUpdate({name: updateName}, {$set: {count: 0}}, {returnOriginal: false, upsert: true});
     res.send('good');
 });
 
@@ -100,7 +95,8 @@ router.post('/new', (req, res) => {
     console.log('POST /api/new');
     const leaderboardName = req.body.name;
     mdb.createCollection(leaderboardName)
-        .then((err, data) => {
+        .then((err) => {
+            mdb.collection('BoardList').insertOne({name: leaderboardName});
             if (err) {
                 res.send('Failed to create new leaderboard');
             } else {
@@ -108,7 +104,7 @@ router.post('/new', (req, res) => {
             }
         });
 
-})
+});
 
 router.post('/newplayer', (req, res) => {
     console.log('POST /api/newplayer');
@@ -129,11 +125,11 @@ router.post('/newplayer', (req, res) => {
                     wins: 0,
                     losses: 0,
                     games: 0
-                })
+                });
                 res.send('Succeed');
             }
-        })
+        });
 
-})
+});
 
 export default router;

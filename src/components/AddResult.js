@@ -31,14 +31,14 @@ export default class AddResult extends Component {
                     leaderboards: leaderboardsDropdown});
             })
             .catch(console.error);
-    };
+    }
 
     getPlayers(e, data){
         const path = `/api/leaderboard/${data.value}`;
         axios.get(path)
             .then(resp => {
                 const playerDropdown = [];
-                const data = resp.data
+                const data = resp.data;
                 for (const i in data) {
                     const element = {};
                     element['key'] = data[i]._id;
@@ -51,13 +51,13 @@ export default class AddResult extends Component {
                 });
             })
             .catch(console.error);
-        let gameData = {}
+        let gameData = {};
         gameData['leaderboard'] = data.value;
         let newGameData = Object.assign({}, this.state.gameData, gameData);
         this.setState({
             gameData: newGameData
-        })
-    };
+        });
+    }
 
     renderPlayers() {
         let list = [];
@@ -65,14 +65,14 @@ export default class AddResult extends Component {
             list.push(<Dropdown id={`player_${i}`} data="test" key={`player_${i}`} placeholder='Select player' search selection options={this.state.players} onChange={this.logSelectedData.bind(this)}/>);
         }
         return list;
-    };
+    }
 
     playerIncreament() {
             const numPlayers = this.state.numDropdowns;
             this.setState ({
                 numDropdowns: numPlayers + 1
             });
-    };
+    }
 
     submitResult() {
         const gameData = this.state.gameData;
@@ -89,10 +89,10 @@ export default class AddResult extends Component {
                 this.setState ({
                     sucess: true,
                     toLeaderboard: true
-                })
+                });
             }
-        })
-    };
+        });
+    }
 
     logSelectedData(e, data) {
         let gameData = {};
@@ -105,7 +105,7 @@ export default class AddResult extends Component {
         this.setState({
             gameData: newGameData
         });
-    };
+    }
 
     getResult() {
         const gameData = this.state.gameData;
@@ -116,35 +116,35 @@ export default class AddResult extends Component {
 
         players = players + ', ' + gameData[prop];
     }
-        return `${gameData.winner} won the game ${gameData.leaderboard} aganst ${players}`
-    };
+        return `${gameData.winner} won the game ${gameData.leaderboard} against ${players}`;
+    }
 
     handleCancel() {
         this.setState({
             openConfirm: false
-        })
-    };
+        });
+    }
 
     confirm() {
         if (this.state.gameData && this.state.gameData.winner) {
             this.setState({
                 openConfirm: true,
                 error: false
-            })
+            });
         }
         else {
             this.setState({
                 error: true
             });
         }
-    };
+    }
 
     render() {
         const label = this.state.sucess ? <Label basic color='green' pointing='left'>Succeed!</Label> : '';
         const leaderboardPath = `/leaderboard/${this.state.gameData.leaderboard}`;
 
         if (this.state.toLeaderboard) {
-            return <Redirect push to={leaderboardPath} />
+            return <Redirect push to={leaderboardPath} />;
         }
         return (
             <div>
@@ -171,6 +171,6 @@ export default class AddResult extends Component {
                     {label}
                 </div>
             </div>
-        )
+        );
     }
 }

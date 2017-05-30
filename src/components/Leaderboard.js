@@ -14,7 +14,7 @@ export default class Leaderboard extends Component{
 
     componentDidMount() {
         const name = this.props.match.params.gameName;
-        const path = `/api/leaderboard/${name}`
+        const path = `/api/leaderboard/${name}`;
         axios.get(path)
             .then(resp => {
                 this.setState({
@@ -71,11 +71,11 @@ export default class Leaderboard extends Component{
                 </Table>
                 <p><i aria-hidden="true" className="spy icon"></i> Indicates possible cheating and/or use of performance enhancing drugs</p>
                 </div>
-            )
+            );
         } else {
             return (
                 <Loading />
-            )
+            );
         }
     }
 }

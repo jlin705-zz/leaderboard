@@ -43,8 +43,8 @@ class Header extends Component {
                 Log result
                 </Menu.Item>
                 <Menu.Menu position='right'>
-                    <Menu.Item>
-                      <Input icon='search' placeholder='Search...' />
+                    <Menu.Item name='Log result' active={activeItem === 'Donuts'} to='/donuts' onClick={this.handleMenuClick}>
+                    Donuts
                     </Menu.Item>
                   </Menu.Menu>
             </Menu>
