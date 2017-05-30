@@ -6,8 +6,21 @@ import Leaderboard from './Leaderboard';
 import AdderList from './AdderList';
 import DonutsBoard from './DonutsBoard';
 import { Route } from 'react-router-dom';
+import axios from 'axios';
 
 class App extends Component{
+
+    static staticKey = {
+        _csrf: ''
+    }
+
+    componentDidMount() {
+        axios.get('/api/form')
+            .then(resp => {
+                 App.staticKey['_csrf']= resp.data.csrfToken;
+            })
+            .catch(console.error);
+    }
 
     render() {
         return (

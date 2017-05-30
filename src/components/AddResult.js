@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Dropdown, Button, Label, Confirm } from 'semantic-ui-react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
+import App from './App';
 
 export default class AddResult extends Component {
     state = {
@@ -17,7 +18,7 @@ export default class AddResult extends Component {
     componentDidMount() {
         axios.get('/api/boardList')
             .then(resp => {
-                const data = resp.data.leaderboards;
+                const data = resp.data;
                 const leaderboardsDropdown = [];
                 for (const i in data) {
                     const element = {};
@@ -83,7 +84,7 @@ export default class AddResult extends Component {
                 'Content-Type': 'application/json'
             },
             url: path,
-            data: gameData
+            data: Object.assign({}, gameData, App.staticKey)
         }).then(resp => {
             if (resp.data == 'good') {
                 this.setState ({

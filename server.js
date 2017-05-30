@@ -7,17 +7,21 @@ import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+
 
 import express from 'express';
 
 const server = express();
+
+server.use(cookieParser());
 
 server.use(bodyParser.json());
 
 server.use(sassMiddleware({
     src: path.join(__dirname, 'sass'),
     dest: path.join(__dirname, 'public')
-}))
+}));
 
 server.set('view engine', 'ejs');
 

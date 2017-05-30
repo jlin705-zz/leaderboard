@@ -39,11 +39,11 @@ class Header extends Component {
                 <Menu.Item name='Leaderboards' active={activeItem === 'Leaderboards'} to='/leaderboards' onClick={this.handleMenuClick}>
                 Leaderboards
                 </Menu.Item>
-                <Menu.Item name='Log result' active={activeItem === 'Log Result'} to='/logResult' onClick={this.handleMenuClick}>
+                <Menu.Item name='Log Result' active={activeItem === 'Log Result'} to='/logResult' onClick={this.handleMenuClick}>
                 Log result
                 </Menu.Item>
                 <Menu.Menu position='right'>
-                    <Menu.Item name='Log result' active={activeItem === 'Donuts'} to='/donuts' onClick={this.handleMenuClick}>
+                    <Menu.Item name='Donuts' active={activeItem === 'Donuts'} to='/donuts' onClick={this.handleMenuClick}>
                     Donuts
                     </Menu.Item>
                   </Menu.Menu>

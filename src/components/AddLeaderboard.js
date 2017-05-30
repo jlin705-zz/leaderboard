@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Input, Button, Confirm, Label } from 'semantic-ui-react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
+import App from './App';
 
 export default class AddLeaderboard extends Component {
     state = {
@@ -26,7 +27,7 @@ export default class AddLeaderboard extends Component {
                 'Content-Type': 'application/json'
             },
             url: path,
-            data: {name: leaderboardName}
+            data: Object.assign({name: leaderboardName}, App.staticKey)
         }).then(() => {
                 this.setState ({
                     sucess: true,

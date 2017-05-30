@@ -1,6 +1,12 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import config from '../config';
+import csrf from 'csurf';
+import bodyParser from 'body-parser';
+
+let csrfProtection = csrf({ cookie: true });
+let parseForm = bodyParser.urlencoded({ extended: false });
+
 
 let mdb;
 
@@ -13,6 +19,11 @@ MongoClient.connect(config.mongodbUri, (err, db) => {
 });
 
 const router = express.Router();
+
+router.get('/form', csrfProtection, (req, res) => {
+  // pass the csrfToken to the view
+  res.send( { csrfToken: req.csrfToken() });
+});
 
 router.get('/boardList', (req, res) => {
     console.log('GET /api/boardList');
@@ -49,7 +60,7 @@ router.get('/leaderboard/:name', (req, res) => {
 
 });
 
-router.put('/update/:name', (req, res) => {
+router.put('/update/:name',parseForm, csrfProtection, (req, res) => {
     let leaderboardName = req.params.name;
     console.log(`PUT /api/update/${leaderboardName}`);
     const data = req.body;
@@ -75,7 +86,7 @@ router.put('/update/:name', (req, res) => {
     res.send('good');
 });
 
-router.put('/donuts/add/:name', (req, res) => {
+router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     console.log(`PUT /api/donuts/add/${updateName}`);
     const collectionDonuts = mdb.collection('RentalsDonuts');
@@ -83,7 +94,7 @@ router.put('/donuts/add/:name', (req, res) => {
     res.send('good');
 });
 
-router.put('/donuts/clear/:name', (req, res) => {
+router.put('/donuts/clear/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     console.log(`PUT /api/donuts/add/${updateName}`);
     const collectionDonuts = mdb.collection('RentalsDonuts');
@@ -91,7 +102,7 @@ router.put('/donuts/clear/:name', (req, res) => {
     res.send('good');
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', parseForm, csrfProtection, (req, res) => {
     console.log('POST /api/new');
     const leaderboardName = req.body.name;
     mdb.createCollection(leaderboardName)
@@ -106,7 +117,7 @@ router.post('/new', (req, res) => {
 
 });
 
-router.post('/newplayer', (req, res) => {
+router.post('/newplayer',parseForm, csrfProtection, (req, res) => {
     console.log('POST /api/newplayer');
     const data = req.body;
     const leaderboard = data.leaderboard;

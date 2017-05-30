@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import {Table, Button} from 'semantic-ui-react';
 import Emojify from 'react-emojione';
+import App from './App';
 
 export default class DonutsElement extends Component{
     static propTypes = {
@@ -23,6 +24,7 @@ export default class DonutsElement extends Component{
                 'Content-Type': 'application/json'
             },
             url: path,
+            data: App.staticKey
         }).then(resp => {
             if (resp.data == 'good') {
                 currentCount = currentCount + 1;
@@ -41,6 +43,7 @@ export default class DonutsElement extends Component{
                 'Content-Type': 'application/json'
             },
             url: path,
+            data: App.staticKey
         }).then(resp => {
             if (resp.data == 'good') {
                 this.setState({

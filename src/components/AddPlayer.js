@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Input, Button, Dropdown, Label } from 'semantic-ui-react';
+import App from './App';
 import axios from 'axios';
 
 export default class AddPlayer extends Component {
@@ -12,7 +13,7 @@ export default class AddPlayer extends Component {
     componentDidMount() {
         axios.get('/api/boardList')
             .then(resp => {
-                const data = resp.data.leaderboards;
+                const data = resp.data;
                 const leaderboardsDropdown = [];
                 for (const i in data) {
                     const element = {};
@@ -26,13 +27,13 @@ export default class AddPlayer extends Component {
                     leaderboards: leaderboardsDropdown});
             })
             .catch(console.error);
-    };
+    }
 
     getPlayerName(e, data) {
         this.setState({
             playerName: data.value
-        })
-    };
+        });
+    }
 
     submit() {
         const leaderboardName = this.state.leaderboard;
@@ -44,10 +45,10 @@ export default class AddPlayer extends Component {
                 'Content-Type': 'application/json'
             },
             url: path,
-            data: {
+            data: Object.assign({
                 leaderboard: leaderboardName,
-                player: playerName
-            }
+                player: playerName,
+            }, App.staticKey)
         }).then(resp => {
             if (resp.data == 'Succeed') {
                 this.setState ({
