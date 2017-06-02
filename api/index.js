@@ -70,7 +70,7 @@ router.put('/update/:name',parseForm, csrfProtection, (req, res) => {
     for (let x in data) {
         if (data.hasOwnProperty(x)) playerCount ++;
     }
-    playerCount = playerCount - 2;
+    playerCount = playerCount - 3;
 
     if (winner) {
         collection.findOneAndUpdate({name: winner}, {$inc: {wins: 1, games: 1, points: playerCount}}, {returnOriginal: false, upsert: true});
