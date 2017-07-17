@@ -3,10 +3,12 @@ import { MongoClient } from 'mongodb';
 import config from '../config';
 import csrf from 'csurf';
 import bodyParser from 'body-parser';
+import datetime from 'node-datetime';
 
 let csrfProtection = csrf({ cookie: true });
 let parseForm = bodyParser.urlencoded({ extended: false });
 
+const MINUTE = 60000;
 
 let mdb;
 
@@ -88,10 +90,17 @@ router.put('/update/:name',parseForm, csrfProtection, (req, res) => {
 
 router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
-    console.log(`PUT /api/donuts/add/${updateName}`);
-    const collectionDonuts = mdb.collection('RentalsDonuts');
-    collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}}, {returnOriginal: false, upsert: true});
-    res.send('good');
+    const last = datetime.create(req.body.lastModified);
+    const now = datetime.create();
+    if (now.getTime() - last.getTime() < 30 * MINUTE) {
+        res.send('too soon');
+    } else {
+        const formattedNow = now.format('m/d/Y H:M:S');
+        console.log(`PUT /api/donuts/add/${updateName}`);
+        const collectionDonuts = mdb.collection('RentalsDonuts');
+        collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}, $set: {lastModified: formattedNow}}, {returnOriginal: false, upsert: true});
+        res.send(formattedNow);
+    }
 });
 
 router.put('/donuts/clear/:name',parseForm, csrfProtection, (req, res) => {

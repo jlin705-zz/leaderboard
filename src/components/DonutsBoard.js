@@ -30,11 +30,12 @@ export default class DonutsBoard extends Component{
                             <Table.HeaderCell>Name</Table.HeaderCell>
                             <Table.HeaderCell>Current Dounuts Count</Table.HeaderCell>
                             <Table.HeaderCell>More Donuts</Table.HeaderCell>
+                            <Table.HeaderCell>Last Modified</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         {data.map( obj =>
-                            <DonutsElement name={obj.name} count={obj.count} key={obj.name} />
+                            <DonutsElement name={obj.name} count={obj.count} key={obj.name} lastModified={obj.lastModified ? obj.lastModified : ''} />
                         )}
                     </Table.Body>
                 </Table>
