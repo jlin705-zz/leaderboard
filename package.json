@@ -1,7 +1,6 @@
 {
   "name": "cantstop",
   "version": "1.0.0",
-  "engines": "6.11.1",
   "description": "Can't stop",
   "main": "index.js",
   "scripts": {
