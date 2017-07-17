@@ -103,6 +103,35 @@ router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     }
 });
 
+router.get('/donuts/slackadd/:name', (req, res) => {
+    const name = req.params.name;
+    const now = datetime.create();
+    const collectionDonuts = mdb.collection('RentalsDonuts');
+    let last = datetime.create('1/1/1967');
+    collectionDonuts.find({'name': name})
+        .sort({'count': -1, 'name': 1})
+        .toArray((err, docs) => {
+            if (err) {
+                console.error(err);
+            }
+            if (!docs[0]) {
+                res.send('Can\'t find ' + name);
+                return;
+            }
+            if (docs[0].lastModified) {
+                last = datetime.create(docs[0].lastModified);
+            }
+            if (now.getTime() - last.getTime() > 30 * MINUTE) {
+                const formattedNow = now.format('m/d/Y H:M:S');
+                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: formattedNow}}, {returnOriginal: false, upsert: true});
+                const newCount = docs[0].count + 1;
+                res.send('Added 1 Donut point to ' + name + ', current count: ' + newCount);
+            } else {
+                res.send('Donut point can be added once per 30 mins!');
+            }
+        });
+})
+
 router.put('/donuts/clear/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     console.log(`PUT /api/donuts/add/${updateName}`);
