@@ -125,9 +125,9 @@ router.get('/donuts/slackadd/:name', (req, res) => {
                 const formattedNow = now.format('m/d/Y H:M:S');
                 collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: formattedNow}}, {returnOriginal: false, upsert: true});
                 const newCount = docs[0].count + 1;
-                res.send('Added 1 Donut point to ' + name + ', current count: ' + newCount);
+                res.send('Added 1 :donut: to ' + name + ', current count: ' + newCount);
             } else {
-                res.send('Donut point can be added once per 30 mins!');
+                res.send(':donut: can be added once per 30 mins!');
             }
         });
 })
