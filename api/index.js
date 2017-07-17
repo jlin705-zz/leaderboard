@@ -91,7 +91,7 @@ router.put('/update/:name',parseForm, csrfProtection, (req, res) => {
 router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     const last = datetime.create(req.body.lastModified);
-    const now = datetime.create();
+    const now = datetime.create().offsetInHours(7);
     if (now.getTime() - last.getTime() < 30 * MINUTE) {
         res.send('too soon');
     } else {
@@ -105,7 +105,7 @@ router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
 
 router.get('/donuts/slackadd/:name', (req, res) => {
     const name = req.params.name;
-    const now = datetime.create();
+    const now = datetime.create().offsetInHours(7);
     const collectionDonuts = mdb.collection('RentalsDonuts');
     let last = datetime.create('1/1/1967');
     collectionDonuts.find({'name': name})
