@@ -1,7 +1,10 @@
 {
   "name": "cantstop",
   "version": "1.0.0",
-  "engines": "8.1.4",
+  "engines": {
+    "node": "8.1.4",
+    "npm": "5.3.0"
+  },
   "description": "Can't stop",
   "main": "index.js",
   "scripts": {
