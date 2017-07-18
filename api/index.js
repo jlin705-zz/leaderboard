@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 import config from '../config';
 import csrf from 'csurf';
 import bodyParser from 'body-parser';
-import datetime from 'node-datetime';
+import moment from 'moment';
 
 let csrfProtection = csrf({ cookie: true });
 let parseForm = bodyParser.urlencoded({ extended: false });
@@ -90,24 +90,23 @@ router.put('/update/:name',parseForm, csrfProtection, (req, res) => {
 
 router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
-    const last = datetime.create(req.body.lastModified);
-    const now = datetime.create().offsetInHours(7);
-    if (now.getTime() - last.getTime() < 30 * MINUTE) {
+    const last = moment(req.body.lastModified);
+    const now = moment();
+    if (now.valueOf() - last.valueOf() < 30 * MINUTE) {
         res.send('too soon');
     } else {
-        const formattedNow = now.format('m/d/Y H:M:S');
         console.log(`PUT /api/donuts/add/${updateName}`);
         const collectionDonuts = mdb.collection('RentalsDonuts');
-        collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}, $set: {lastModified: formattedNow}}, {returnOriginal: false, upsert: true});
-        res.send(formattedNow);
+        collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}, $set: {lastModified: now.valueOf()}}, {returnOriginal: false, upsert: true});
+        res.json({time: now.valueOf()});
     }
 });
 
 router.get('/donuts/slackadd/:name', (req, res) => {
     const name = req.params.name;
-    const now = datetime.create().offsetInHours(7);
+    const now = moment();
     const collectionDonuts = mdb.collection('RentalsDonuts');
-    let last = datetime.create('1/1/1967');
+    let last = moment(0);
     collectionDonuts.find({'name': name})
         .sort({'count': -1, 'name': 1})
         .toArray((err, docs) => {
@@ -119,11 +118,10 @@ router.get('/donuts/slackadd/:name', (req, res) => {
                 return;
             }
             if (docs[0].lastModified) {
-                last = datetime.create(docs[0].lastModified);
+                last = moment(docs[0].lastModified);
             }
-            if (now.getTime() - last.getTime() > 30 * MINUTE) {
-                const formattedNow = now.format('m/d/Y H:M:S');
-                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: formattedNow}}, {returnOriginal: false, upsert: true});
+            if (now.valueOf() - last.valueOf() > 30 * MINUTE) {
+                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf()}}, {returnOriginal: false, upsert: true});
                 const newCount = docs[0].count + 1;
                 res.send('Added 1 :donut: to ' + name + ', current count: ' + newCount);
             } else {

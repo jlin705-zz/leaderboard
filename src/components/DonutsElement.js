@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import {Table, Button, Label} from 'semantic-ui-react';
 import Emojify from 'react-emojione';
+import moment from 'moment';
 import App from './App';
 
 export default class DonutsElement extends Component{
@@ -34,7 +35,7 @@ export default class DonutsElement extends Component{
                 currentCount = currentCount + 1;
                 this.setState({
                     count: currentCount,
-                    lastModified: resp.data
+                    lastModified: resp.data.time
                 });
             } else {
                 this.setState({
@@ -77,7 +78,7 @@ export default class DonutsElement extends Component{
 
     render() {
         const donutsEmoj = this.getEmoji();
-        const lastModified = this.state.lastModified;
+        const lastModified = moment(this.state.lastModified).format();
         const error = this.state.tooSoon ? <Label basic color='red' pointing='left'>Try again in 30 mins</Label> : '';
         return (
             <Table.Row key={this.props.name}>
