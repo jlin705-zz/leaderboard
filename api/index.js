@@ -103,9 +103,11 @@ router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
 });
 
 router.get('/donuts/slackadd/:name', (req, res) => {
+    console.log('GET add donut from slack');
     const name = req.params.name;
     const now = moment();
     const collectionDonuts = mdb.collection('RentalsDonuts');
+    const ip = req.ip;
     let last = moment(0);
     collectionDonuts.find({'name': name})
         .sort({'count': -1, 'name': 1})
@@ -121,7 +123,7 @@ router.get('/donuts/slackadd/:name', (req, res) => {
                 last = moment(docs[0].lastModified);
             }
             if (now.valueOf() - last.valueOf() > 30 * MINUTE) {
-                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf()}}, {returnOriginal: false, upsert: true});
+                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
                 const newCount = docs[0].count + 1;
                 res.send('Added 1 :donut: to ' + name + ', current count: ' + newCount);
             } else {
