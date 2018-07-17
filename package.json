@@ -36,6 +36,7 @@
     "giphy-api": "^1.2.5",
     "google-images": "^2.1.0",
     "history": "^4.6.0",
+    "i18next": "^11.3.6",
     "json-loader": "^0.5.4",
     "moment": "^2.18.1",
     "mongodb": "^2.2.24",
@@ -43,7 +44,7 @@
     "nodemon": "^1.11.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "react-emojione": "^5.0.0",
+    "react-emojione": "^3.1.10",
     "react-router-dom": "^4.0.0",
     "semantic-ui-react": "^0.67.1",
     "style-loader": "^0.13.2",
@@ -62,6 +63,8 @@
     "eslint-plugin-react": "^6.10.0",
     "extract-text-webpack-plugin": "^2.1.0",
     "gulp": "^3.9.1",
+    "i18next-scanner": "^2.6.3",
+    "post-commit": "0.0.1",
     "semantic-ui": "^2.2.9",
     "webpack": "^2.2.1"
   }
