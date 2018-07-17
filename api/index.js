@@ -41,7 +41,7 @@ router.get('/donuts', (req, res) => {
     console.log('GET /api/donuts');
     mdb.collection('RentalsDonuts')
         .find({})
-        .sort({'count': -1, 'name': 1})
+        .sort({'dozen': -1, 'count': -1, 'name': 1})
         .toArray((err, docs) => {
             if (err) {
                 console.error(err);
@@ -92,13 +92,22 @@ router.put('/donuts/add/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     const last = moment(req.body.lastModified);
     const now = moment();
+    const ip = req.ip;
     if (now.valueOf() - last.valueOf() < 30 * MINUTE) {
         res.send('too soon');
     } else {
         console.log(`PUT /api/donuts/add/${updateName}`);
         const collectionDonuts = mdb.collection('RentalsDonuts');
-        collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {count: 1}, $set: {lastModified: now.valueOf()}}, {returnOriginal: false, upsert: true});
-        res.json({time: now.valueOf()});
+        collectionDonuts.findOne({name: updateName})
+            .then(doc =>{
+                if(doc.count < 11){
+                    collectionDonuts.findOneAndUpdate({name: doc.name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
+                }
+                else {
+                    collectionDonuts.findOneAndUpdate({name: doc.name}, {$inc: {count: -11, dozen: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
+                }
+                res.json({time: now.valueOf()});
+            })
     }
 });
 
@@ -123,7 +132,12 @@ router.get('/donuts/slackadd/:name', (req, res) => {
                 last = moment(docs[0].lastModified);
             }
             if (now.valueOf() - last.valueOf() > 30 * MINUTE) {
-                collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
+                if(docs[0].count < 11){
+                    collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
+                }
+                else {
+                    collectionDonuts.findOneAndUpdate({name: name}, {$inc: {count: -11, dozen: 1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: true});
+                }
                 const newCount = docs[0].count + 1;
                 res.send('Added 1 :donut: to ' + name + ', current count: ' + newCount);
             } else {
@@ -135,8 +149,18 @@ router.get('/donuts/slackadd/:name', (req, res) => {
 router.put('/donuts/clear/:name',parseForm, csrfProtection, (req, res) => {
     let updateName = req.params.name;
     console.log(`PUT /api/donuts/add/${updateName}`);
+    const ip = req.ip;
+    const now = moment();
     const collectionDonuts = mdb.collection('RentalsDonuts');
-    collectionDonuts.findOneAndUpdate({name: updateName}, {$set: {count: 0}}, {returnOriginal: false, upsert: true});
+    //collectionDonuts.findOneAndUpdate({name: updateName}, {$set: {$cond: {if: {$gte: ["$count"]}}}{count: 0}}, {returnOriginal: false, upsert: true});
+    collectionDonuts.findOne({name: updateName})
+        .then(doc => {
+            if (doc.dozen > 0){
+                collectionDonuts.findOneAndUpdate({name: updateName}, {$inc: {dozen: -1}, $set: {lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: false})
+            } else {
+                collectionDonuts.findOneAndUpdate({name: updateName}, {$set: {count: 0, lastModified: now.valueOf(), updatedBy: ip}}, {returnOriginal: false, upsert: false})
+            }
+        })
     res.send('good');
 });
 

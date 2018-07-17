@@ -43,7 +43,7 @@
     "nodemon": "^1.11.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "react-emojione": "^3.1.10",
+    "react-emojione": "^5.0.0",
     "react-router-dom": "^4.0.0",
     "semantic-ui-react": "^0.67.1",
     "style-loader": "^0.13.2",
